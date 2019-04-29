@@ -1771,7 +1771,7 @@ pre .javascript .function {
   width: 4px;
   height: 4px;
   border-radius: 50%;
-  background: #ff8cf0;
+  background: #3e5dff;
 }
 .feed-link,
 .chat {
@@ -2494,7 +2494,7 @@ embed {
 }
 .main-inner {
   margin-top: 60px;
-  padding: 8%;
+  padding: 5%;
   background: rgba(255,255,255,0.8);
   min-height: 500px;
 }
