@@ -1,0 +1,104 @@
+<?xml version="1.0" encoding="utf-8"?>
+<search>
+  <entry>
+    <title><![CDATA[VolgaCTF Writeup]]></title>
+    <url>%2F2019%2F04%2F29%2FVolgaCTF%2F</url>
+    <content type="text"><![CDATA[VolgaCTF Writeup by Angr4Mainyu1.shadow_cat这个给了一个shadow.txt文件和一串加密后的字符串，一眼倒是看不出什么东西，直接尝试对shadow文件进行爆破。 使用hash cat工具，然后选择一个字典进行爆破，很快得到结果： 然后根据与用户名对应，得到如下的替换: 12jr:1 z:_ a:a x:b q:c l:w v:h e:i f:j b:k r:l g:m n:n o:x p:y s:d c:e w:f d:g t:o h:p m:q k:u i:v y:r j:s u:tunderscore:z 显然接下来只需要根据这个替换，就可以得到我们的flag了，直接编写脚本替换即可： 12345text = 'hajjzvajvzqyaqbendzvajvqauzarlapjzrkybjzenzuvczjvastlj'for j in text:... print(a[j],end = '')... pass_hash_cracking_hashcat_always_lurks_in_the_shadows （交上去的时候注意格式） flag：VolgaCTF{pass_hash_cracking_hashcat_always_lurks_in_the_shadows} 2.JOI不知道这一题凭啥值150分..也太水了吧 直接使用Stegsolve打开，然后转到Red plane 0，就会发现这个二维码不太一样，直接扫码就可以拿到flag了 flag：VolgaCTF{5t3g0_m4tr3shk4_in_4cti0n} 3.Blind这题是考察了RSA的攻击手法，从给出的服务器端脚本可以看出，能让我们执行的命令只有dir,ls,cat,cd这几个命令。 而脚本中并没有对ls和dir命令进行过滤，我们可以直接输入，看看目录下有些什么： 123456zhangzhh@你这聋子:/mnt/d/CTF/volcactf/Blind$ nc blind.q.2019.volgactf.ru 7070Enter your command:3 lsflagprivate_key.pyserver.py 发现目录下有个flag文件，那么就是我们的目标就是读取这个flag文件了，让服务器执行cat flag命令。 但是直接执行cat flag的话，我们并没有对应这个命令的signature，所以系统并不会让我们执行这个命令。这时注意到其实还有个sign指令，能够返回任意指令的signature，但是不能是cat命令。 那么现在思路就有了，我们需要间接地求出cat flag对应的的signature。根据数论的知识我们知道:$$(m1 \times m2) \bmod n = ((m1 \bmod n ) \times（m2 \bmod n)) \bmod n$$那么只需要把cat flag对应的数进行分解，然后分别求出其加密之后的signature，就可以计算得到cat flag的signature了 123'cat flag' = 7161132565001953639factor 71611325650019536397161132565001953639: 103 408479 170205956447 分解成两个数103和69525558883514113，然后分别得到对应的两个signature 12m1 = 17638787469642039435318581385618808297268376774234879657983959486588488518602104982122891156593317044292766030845687731228499038739756875964186679785382736177049112662098526726358737509567429436403098863630151350780807034720456854963415607468739968754202506998385349296290129607434002404738918120538229071656978017808466596814950226784314700317088934348540608219987543730472643691009060755872926833135443517648919261924577246564970061451282151317589401229797945517104524760889684000361260339607131828972845536284354091935086720068566032733497050626156914558343862499749490577165803099065730472936347462992778753796941m2 = 25546621042567021743921441656485106150773028771975739792395292839524991698929912254223690969899881717956277954181362001941084170643987790900354897720201198641241865168483559029881918212009804506724025449021632061776772429841832820822248791924286727129159693622880243660612170666428534633987262142793095526136680155894125768641992318145581399148611597046840862019696663630366704554135979924498320452192198270792856017753126515861945695789558862132300276176002546820728010847776307161844028813344882966643480384082356366425666269055026587464161965878493074595945942518737289891784899462357520515374555016064334840465912 计算得到 12m = (m1 * m2) %nm = 24276592954466402792157532919706447334355948690098023035375614012157378412616233865544533025515869836447793226406373271083160180523082800598281266834619631704245143244545577613294590334637358684061108293899492468337030535564036215463887905645938530571058038030943037016298964167966109577883005551522062164917343818964991120441652232394288629520079832539360872798332983684006902802429243645009242747601354050053448137191986860769673762567997572657102990869994555786984110522299362261357652756180804304984027320764350120137457095771345729635881422070403269427999652221843885023772233721400195669139542781850847904777323 成功拿到flag: flag：VolgaCTF{B1ind_y0ur_tru3_int3nti0n5} PS：按照同样的方法，我们还可以拿到服务器端的私钥，只需要将cmd换成cat private_key.py]]></content>
+      <tags>
+        <tag>CTF</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title><![CDATA[数据库理论11]]></title>
+    <url>%2F2019%2F04%2F29%2Fhomework11%2F</url>
+    <content type="text"><![CDATA[15.2考虑下面两个事务:$$\begin{aligned}T_{34}:&amp;read(A);\\&amp;read(B);\\&amp;if\ A = 0 \ then\ B:=B+1\\&amp;write(B);\end{aligned}$$ $$\begin{aligned}T_{35}:&amp;read(B);\\&amp;read(A);\\&amp;if\ B=0\ then\ A:=A+1;\\&amp;write(A).\end{aligned}$$ 给事务T与T增加加锁、解锁指令,使它们遵从两阶段封锁协议。这两个事务会引起死锁吗? 答：增加加锁解锁之后如下：$$\begin{aligned}T_{34}:&amp;lock\ S(A)\\&amp;read(A);\\&amp;lock\ X(B)\\&amp;read(B);\\&amp;if\ A = 0 \ then\ B:=B+1\\&amp;write(B);\\&amp;unlock(A)\\&amp;unlock(B)\\\end{aligned}$$ $$\begin{aligned}T_{35}:&amp;lock\ S(B)\\&amp;read(B);\\&amp;lock\ X(A)\\&amp;read(A);\\&amp;if\ B = 0 \ then\ A:=A+1\\&amp;write(A);\\&amp;unlock(B)\\&amp;unlock(A)\\\end{aligned}$$ 然后执行这两个事务的话是会造成死锁的，举例如下: $T_{34}$先执行$lock\ S(A)$， 然后$T_{35}$执行$lock\ S(B)$和$read(B)$， 接着$T_{34}$执行$read(A)$和$lock\ X(B)$ 这个时候$T_{34}$就会被阻塞，进而转到$T_{35}$执行， 而$T_{35}$执行的是$lock\ X(A)$，此时这个锁已经被另外一个事务获取了，故$T_{35}$也会被阻塞 此时就形成了死锁现象。]]></content>
+      <tags>
+        <tag>MySQL</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title><![CDATA[数据库理论10]]></title>
+    <url>%2F2019%2F04%2F29%2Fhomework10%2F</url>
+    <content type="text"><![CDATA[数据库理论作业1014.15考虑下面两个事务:$$\begin{aligned}T_{13}:&amp;read(A);\\&amp;read(B);\\&amp;if\ A = 0 \ then\ B:=B+1\\&amp;write(B);\end{aligned}$$ $$\begin{aligned}T_{14}:&amp;read(B);\\&amp;read(A);\\&amp;if\ B=0\ then\ A:=A+1;\\&amp;write(A).\end{aligned}$$ 设一致性需求为$A=0\vee B=0$，初值是$A=B=0$。 a. 说明包括这两个事务的每一个串行执行都保持数据库的一致性。 答：当先执行$T_{13}$再执行$T_{14}$时，情况如下： 过程 A B 初始值 0 0 $T_{13}$之后 0 1 $T_{14}$之后 0 1 完全执行完成之后，此时$A=0\vee B=0\equiv{False\vee True}\equiv True$ 当先执行$T_{14}$再执行$T_{13}$时，情况如下: 过程 A B 初始值 0 0 $T_{14}$之后 1 0 $T_{13}$之后 1 0 完全执行完成之后，此时$A=0\vee B=0\equiv{True\vee False}\equiv True$ b.给出$T_{13}$和$T_{14}$的一次并发执行，执行产生不可串行化调度。 答：执行顺序如下： 步骤 $T_{1}$ $T_{2}$ $1$ $read(A);$ $2$ $read(B);$ $3$ $read(A);$ $4$ $read(B);$ $5$ $if\ A = 0 \ then\ B:=B+1;$ $6$ $if\ B=0\ then\ A:=A+1;$ $7$ $write(B)$ $8$ $write(A)$ c.存在产生可串行化调度的$T_{13}$和$T_{14}$的并发执行吗？ 答：不存在。 比如说当$T_{13}$先执行了$read(A)$之后，此时在该进程中就会认为$A$一直等于$1$，在这个情况下无论之后执行顺序是怎么样的，$T_{13}$都会得到$B=1$的结果。而另一个进程$T_{14}$则有可能导致$A=1$也有可能导致$A=0$。若$A=1$了就会导致不满足题目要求的一致性需求，故不存在可串行化的并发执行。]]></content>
+      <tags>
+        <tag>MySQL</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title><![CDATA[数据库理论9]]></title>
+    <url>%2F2019%2F04%2F29%2Fhomework9%2F</url>
+    <content type="text"><![CDATA[12.3设关系$r_1(A,B,C),r_2(C,D,E)$有如下特性：$r_1$有$20000$个元组，$r_2$有$45000$个元组，一块中可容纳$25$个$r_1$元组或$30$个$r_2$元组。估计使用以下连接策略计算$r_1✕r_2$需要几次块传输和磁盘搜索：分析：$r_1$需要$20000/25=800$个块，$r_2$需要$45000/30=1500$个块， 假设我们的内存有$M$页，当$M&gt;800$时，两个关系都能放到内存里，下列所有的算法代价为：$ b_s + b_r$，大约需要$2300$个块存取。 下面考虑$M\leq800$的情况。 嵌套循环连接 答：当使用$r_1$作为外部连接时， ​ 总共需要$20000*1500+800$即$30000800$次块存取 ​ 当使用$r_2$作为外部连接时， ​ 总共需要$45000*800+1500$即$36001500$次块存取 块嵌套循环连接 答：当使用$r_1$作为外部连接时， ​ 总共需要$\lceil \frac{800}{M-1} \rceil*1500+800$次块存取 ​ 当使用$r_2$作为外部连接时， ​ 总共需要$\lceil \frac{1500}{M-1} \rceil*800+1500$次块存取 归并连接 答：算上排序的成本$$B_s=1500(2\lceil{log_{M-1}(\frac{1500}M)}\rceil+2)+800(2\lceil{log_{M-1}(\frac{800}M)}\rceil+2)$$​ 此时总成本为$B_s+1500+800$次块存取； 散列连接 答：假设结果不溢出。 ​ 由于$r_1$较小，我们使用$r_1$ 作为构建关系，使用$r_2$作为探测关系。 ​ 当$M&gt; \frac{800}M$时， ​ 可以使用递归分区，总共需要进行$3*(1500 + 800)= 6900$次块存取 ​ 当$M\leq\frac{800}M$时， ​ 总共需要进行$2*(1500 + 800)⌈log_{M-1}(800)-1⌉+ 1500 + 800$次块存取。]]></content>
+      <tags>
+        <tag>MySQL</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title><![CDATA[数据库理论8]]></title>
+    <url>%2F2019%2F04%2F29%2Fhomework8%2F</url>
+    <content type="text"><![CDATA[11.3 a用下面的关键码值集合建立一个$B^+$树 (2, 3, 5, 7, 11, 17, 19, 23, 29, 31) 11.4给出上面一棵树在下面这些操作之后的形状 插入9时： 插入10时： 插入8时： 删除23时： 删除19时：]]></content>
+      <tags>
+        <tag>MySQL</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title><![CDATA[数据库理论7]]></title>
+    <url>%2F2019%2F04%2F29%2Fhomework7%2F</url>
+    <content type="text"><![CDATA[8.29考虑如下关系模型$r(A,B,C,D,E,F)$上的函数依赖集F: $$A→BCD$$ $$BC→DE$$ $$B→D$$ $$D→A$$ 计算$B^+$ $B→BD$（依赖三） $BD→ABD$（依赖四） $ABD→ABCD$（依赖一） $ABCD→ABCDE$（依赖二） 故$B^+=ABCDE$ (使用Armstrong公理)证明$AF$是超码。 $A→BCD$（依赖一） $A→ABCD$（A的增强） $BC→DE$（依赖二） $ABCD→ABCDE$（$ABCD$的增强） $A→ABCDE$（传递性） $AF→ABCDEF（F$的增强） 故$AF$是超码 计算上述函数依赖集$F$的正则覆盖；给出你的推到的步骤并解释。 根据依赖三我们知道D在依赖一和依赖二中都是冗余值，所以当我们将这两个移除之后，我们就得到了新的规则：$A→BC$ $BC→E$ $B→D$ $D→A$ 而$B^+$是$ABCDE$，而且$FDB→E$可以从这个集合里面被定义，因此，$C$在依赖三中也是一个冗余值，再将其移除，并且合并到我们的$FD$之中，我们得到如下正则覆盖： $A→BC$ $B→DE$ $D→A$ 现在已经没有任何的冗余值了。 基于正则覆盖，给出$r$的一个$3NF$分解。 在正则覆盖中没有$FD，$使得属性集任何其他$FD$的子集。 因此，每个$FD$都会产生自己的关系 给出如下依赖关系： $r_1(A,B,C)$ $r_2(B,D,E)$ $r_3(D,A)$ 现在，属性$F$不依赖于任何属性。因此，它必须是每个超级钥匙的一部分。此外，上述模式中的任何关系都没有$F$，因此，它们都没有超级密钥。因此，我们需要使用超级键添加新关系。 $r_4(A,F)$ 利用原始的函数依赖集，给出$r$的一个$BCNF$分解。 由已知有 $r(A,B,C,D,E,F)$ 我们发现根据第一个$FD$，这个关系并不属于$BCNF，$根据这个可得 $r_1(A,B,C,D)r_2(A,E,F)$ 发现$A→E$是一个在$F^2$中的$FD$，而且使得$r_2$不符合$BCNF$，所以我们再次将$r_2$分解得 $r_1(A,B,C,D)r_2(A,F)r_3(A,E)$ 你能否利用正则覆盖得到与上面的$r$相同的$BCNF$分解？ 如果我们直接在前面的最小函数依赖集中使用函数依赖，我们就无法得到上面的分解。但是，我们可以从最小函数依赖集推断出原始的依赖关系，如果我们将它们用于BCNF分解，就可以得到相同的分解。 8.33给定一个关系模式$r(A,B,C,D),A→→BC$是否裸绩蕴含$A→→B$和$A→→C$？如果是请证明之，否则给出一个反例。 构造如下表: A B C D a1 b1 c1 d1 a1 b2 c2 d2 a1 b1 c1 d2 a1 b2 c2 d1 如果$A→→B，$那么就存在这么一个$t_1和t_3$，使得$t_1[B]=t_3[B]。$ $t_1$和$t_3$必须满足如下关系式： $t_1=r_1 且 t_3=r_3 或者 t_1=r_3 且 t_3=r_1：$ $在t_2=r_2或者t_2=r_4中，t_3[C]\neq t_2[C]$ $t_1=r_2 且 t_3=r_4 或者 t_1=r_4 且 t_3=r_2$ $在t_2=r_1或者t_2=r_3中，t_3[C]\neq t_2[C]$ 由此，$t_3[C]=t_2[C]$就无法被满足，所以这个推测是错误的。]]></content>
+      <tags>
+        <tag>MySQL</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title><![CDATA[数据库理论6]]></title>
+    <url>%2F2019%2F04%2F29%2Fhomework6%2F</url>
+    <content type="text"><![CDATA[8.2列出图8-17所示关系满足的所有函数依赖。 A B C $a_1$ $b_1$ $c_1$ $ a_1$ $b_1$ $c_2$ $a_2$ $b_1$ $c_1$ $a_2$ $b_1$ $c_3$ 答： 非平凡的函数依赖是：A→B，C→B以及AC→B。 在b⊆a中具有形式为a→b的19个平凡的函数依赖。 C并不函数上确定A，因为第一个和第三个元组有着相同的C但是有不同的A值。 同样的元组也表明B没有在函数上确定A。 类似的，A也没有在函数上确定C，因为C中前两个元组具有相同的A值和不同的C值。 同样B也没有在函数上确定C 8.3解释如何用函数依赖表明： 实体集student和instructor间存在一对一联系集 答：若函数依赖Pk(student)→Pk(instructor)和Pk(instructor)→Pk(student)表示一对一的关系，则任何两个具有相同值的学生元组必须和老师的值相同，任何两个元组都保证教师和对应的学生具有相同的价值 实体集student和instructor间存在多对一联系集 答：若函数依赖Pk(student)→Pk(instructor)和Pk(instructor)→Pk(student)表示一个多重关系时，就存在多个学生的值会与同一个导师的值相同。 8.9给定数据库模式R(a, b, c)及模式R上的关系r,写出检验函数依赖b→c是否在关系r上成立的SQL查询。并写出保证函数依赖的SQL断言。假设不存在空值。( 虽然SQL标准中的某些部分，诸如断言等目前还没有在任何数据库实现中得到支持。) 答： 查询语句如下： 1234select bfrom rgroup by bhaving count(distinct c) &gt; 1 结果是非空的当且仅当b→c不包含r时 保证函数依赖的断言： 12345678create assertion b_to_c check(not exists (select b from r group by b having count(distinct c)&gt; 1 ))]]></content>
+      <tags>
+        <tag>MySQL</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title><![CDATA[数据库理论5]]></title>
+    <url>%2F2019%2F04%2F29%2Fhomework5%2F</url>
+    <content type="text"><![CDATA[7.15 为医院构建一个包含一组病人和一组医生的E-R图。为每个病人关联一组不同的检查和化验记录。 7.22 为全球性的快递公司(例如DHL或者 FedEX)设计一个数据库。数据库必须能够追踪(寄件的)客户和(收件的)客户;有些客户可能两者都是。由于每个包裹必须是可标识且可追踪的,因此数据库必须能够存储包裹的位置信息以及它的历史位置。位置包括卡车、飞机、机场和仓库。 你的设计应该包括ER图、关系模式的集合,以及包括主码约束和外码约束的一组约束。 约束条件如下： customer(customer_id, ​ name, ​ address ); packet(packet_id, ​ weight ); place(place_id,city, ​ country, ​ address ); sends(sender_id, ​ receiver_id, ​ packet_id, ​ time_received, ​ time_sent, ​ foreign key sender_id references customer, ​ foreign key receiver_id references customer, ​ foreign key packet_id references packet, ); has_gone_throuth( ​ packet_id, ​ place_id, ​ foreign key packet_id references packet, ​ foreign key place_id references place );]]></content>
+      <tags>
+        <tag>MySQL</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title><![CDATA[数据库理论4]]></title>
+    <url>%2F2019%2F04%2F29%2Fhomework4%2F</url>
+    <content type="text"><![CDATA[6.11 考虑图6-22所示关系数据库，主码加了下划线。给出关系代数表达式来表示下列的每一个查询：employee(person_name,street,city) works(person_name,company_name,salary) company(company_name,city) manages(person_name,manager_name) 找出 First Bank Corporation的所有员工姓名。 123select person_name from workswhere company_name = &apos;First Bank Corporation&apos;; 找出 First Bank Corporation所有员工的姓名和居住城市。 1234select e.person_name, e.cityfrom works w, employee ewhere e.person_name = w.person_name and w.company_name = &apos;First Bank Corporation&apos;; 找出 First Bank Corporation所有年收入在10000美元以上的员工姓名和居住的街道、城市。 123select e.person_name, e.street, e.cityfrom works w, employee ewhere e.person_name = w.person_name and w.salary &gt; 10000 and w.company_name = &apos;First Bank Corporation&apos;; 找出所有居住地与工作的城市在同一个城市的员工姓名。 123select e.person_namefrom works w, employee ewhere e.person_name = w.person_name and e.city = w.city; 假设公司可以位于几个城市之中。找出满足下面条件的所有公司，它位于Small Bank Corporation所位于的每一个城市。 123select A.company_namefrom company A , company Bwhere B.company_name = &apos;Small Bank Corporation&apos; and A.city = B.city;]]></content>
+      <tags>
+        <tag>MySQL</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title><![CDATA[数据库理论3]]></title>
+    <url>%2F2019%2F04%2F29%2Fhomework3%2F</url>
+    <content type="text"><![CDATA[5.2写一个使用JDBC元数据特性的Java函数，该函数用ResultSet作为输入参数，并且把结果输出为合适的名字作为列名的表格形式。12345678910111213141516171819public void HandleResultSet(ResultSet Search_result)&#123; ResultSet result = Search_result; ResultSetMetaData metadata = result.getMetaData(); int ncols = metadata.getColumnCount();// 输出列名 for(int i = 1; i &lt;= ncols; i++) &#123; System.out.print(metadata.getColumnName(i) + " "); &#125; System.out.println(); // 输出数据结果 for(;result.next();) &#123; for(int i = 1; i &lt;= ncols; i++) &#123; System.out.print(result.getString( metadata.getColumnName(i) + " ")); &#125; System.out.println(); &#125; &#125; 5.4说明如何用触发器来保证约束“一位教师不可能在一个学期的同一个时间段在不同的教室里教课”。（要知道，对teachers或者section的改变都可能使该约束被破坏） 当section发生变化时，只需查看该老师在同一时间是否同时出现在两个不同的课室中即可 1234567891011121314create trigger teacher_check after insert on sectionfor each rowBEGIN if count ( select room_number from section natural join teachers where year = new.year and sec_id = new.sec_id and ID = new.ID and semester = new.semester ) &gt; 1 then rollback; end if;END 当teachers发生变化时，同样只需查看该老师在同一时间是否同时出现在两个不同的课室中即可 1234567891011121314create trigger teacher_check after insert on teachersfor each rowBEGIN if count ( select room_number from section natural join teachers where year = new.year and course_id = new.course_id and ID = new.ID and semester = new.semester ) &gt; 1 then rollback; end if;END]]></content>
+      <tags>
+        <tag>MySQL</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title><![CDATA[数据库理论2]]></title>
+    <url>%2F2019%2F04%2F29%2Fhomework2%2F</url>
+    <content type="text"><![CDATA[4.12对于图4-11中的数据库，写出一个查询来找到那些没有经理的雇员。注意一个雇员可能只是没有列出其经理，或者可能有null经理。使用外连接书写查询，然后不用外连接再重写查询。 使用外连接： 12 不使用外连接： 1234567select emplyee_name from employee where not exists (select employee_name from manages where manages.employee_name = employee.employee_name and manages.manager_name is not null); 4.14给定学生每年修到的学分总数，如何定义视图tot_credit(year, num_credits)。 123CREATE VIEW tot_credit AS select year,sum(credits) from takes natural join course group by year; 4.18假定用户A拥有关系r上的所有权限，该用户把关系r上的查询权限以及授予该权限的权限授予给public。假定用户B将r上的查询权限授予A。这是否会导致授权图中的环？解释原因。 答：会导致授权图的环。 ​ 当A将查询权限和授权权限都给了public之后，B是包含在public之中的，所以B也拥有了这两个权限。此时B 再将其查询权限授予了A之后，A还是拥有所有权限。而public和B都拥有查询权限和授予权限，可以相互影响其他人的权限，所有形成了回路。]]></content>
+      <tags>
+        <tag>MySQL</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title><![CDATA[数据库理论1]]></title>
+    <url>%2F2019%2F04%2F29%2Fhomework1%2F</url>
+    <content type="text"><![CDATA[3.12使用大学模式，用SQL写出如下查询。 创建一门课程”CS-001”，其名称为“Weekly Seminar”，学分为0 123456insert into course values (&apos;CS-001&apos;, &apos;Weekly Seminar&apos;, &apos;&apos;, 0 ); 创建该课程在2009年秋季的一个课程段，sec_id为1。 123456789insert into section values (&apos;CS-001&apos;, 1, &apos;Fall&apos;, 2009, NULL, NULL, NULL, ); 让Comp. Sci．系的每个学生都选修上述课程段 。 123456789insert into takes select ID, &apos;CS-001&apos;, 1, &apos;Fall&apos;, 2009, NULL from student where dept_name = &apos;Comp.Sci.&apos;; 删除名为Chavez的学生选修上述课程段的信息。 12345678910delete from takes where course_id = &apos;CS-001&apos; and sec_id = 1 and year = 2009 and ID in ( select ID from student where name = &apos;Chavez&apos; ); 删除课程CS-001。如果在运行此删除语句之前．没有先删除这门课程的授课信息（课程段）, 会发生什么事情？ 12delete from course where course_id = &apos;CS-001&apos;; 如果在这个删除语句之前没有删除授课信息的话，会导致对应课程段的信息和选课信息一同被删除。 删除课程名称中包含“database”的任意课程的任意课程段所对应的所有tasks元组．在课程名的匹配中忽略大小写。 1234567delete from takes where course_id not in (select course_id from course where lower(title) like &apos;%database%&apos; ); 3.16考虑图3-20中的雇员数据库，其中加下划线的是主码。给出下面每个查询对应的SQL表达式： 找出所有为“First Bank Corporation” 工作的雇员名字 123select employee_name from works where company-name = &apos;First Bank Corporation&apos; 找出数据库中所有居住城市和公司所在城市相同的雇员。 1234select employee_name from employee A join works using (employee_name) join company B using (employee_name) where A.city = B.city 找出数据库中所有居住的街道和城市与其经理相同的雇员。 123456select employee_name from employee A, employee B, manages M where A.employee_name = M.employee_name and B.employee_name = M.manager_name and A.street = B.street and A.city = B.city 找出工资高于其所在公司雇员平均工资的所有雇员。 1234567with avg_salary as (select company_name,avg(salary) as val from works group by company_name) select employee_name from works natural join avg_salary where salary &gt; val; 找出工资总和最小的公司。 123456select company_name from works group by company_name having sum(salary) = (select Min(Sum(salary)) from works group by company_name);]]></content>
+      <tags>
+        <tag>MySQL</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title><![CDATA[搭建博客]]></title>
+    <url>%2F2019%2F04%2F28%2F%E6%90%AD%E5%BB%BA%E5%8D%9A%E5%AE%A2%2F</url>
+    <content type="text"><![CDATA[搭建新博客趁着现在稍微比较空闲，尝试搭建一下博客，用来记录一下平常学习和遇到的东西 其实早就想开一个博客了，但是总是没有时间去记录，希望我能坚持下来吧]]></content>
+  </entry>
+</search>
