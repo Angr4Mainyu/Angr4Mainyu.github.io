@@ -355,6 +355,468 @@
   
   
   <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="https://angr4mainyu.github.io/2019/05/02/TV-recommendation/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Angr4 Mainyu">
+      <meta itemprop="description" content="用来记录平常遇到的小东西">
+      <meta itemprop="image" content="/images/avatar.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Angr4 Mainyu's blog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                
+                <a href="/2019/05/02/TV-recommendation/" class="post-title-link" itemprop="url">电视节目推荐系统总体架构及基础算法</a>
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+
+            
+            
+            
+
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+
+              
+                
+              
+
+              <time title="创建时间：2019-05-02 21:00:03 / 修改时间：21:01:00" itemprop="dateCreated datePublished" datetime="2019-05-02T21:00:03+08:00">2019-05-02</time>
+            
+
+            
+              
+
+              
+            
+          </span>
+
+          
+
+          
+            
+            
+              
+              <span class="post-comments-count">
+                <span class="post-meta-divider">|</span>
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-comment-o"></i>
+                </span>
+            
+                <span class="post-meta-item-text">评论数：</span>
+                <a href="/2019/05/02/TV-recommendation/#comments" itemprop="discussionUrl">
+                  <span class="post-comments-count valine-comment-count" data-xid="/2019/05/02/TV-recommendation/" itemprop="commentCount"></span>
+                </a>
+              </span>
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <h2 id="电视节目推荐系统总体架构及基础算法"><a href="#电视节目推荐系统总体架构及基础算法" class="headerlink" title="电视节目推荐系统总体架构及基础算法"></a>电视节目推荐系统总体架构及基础算法</h2><h3 id="1-总体结构"><a href="#1-总体结构" class="headerlink" title="1.总体结构"></a>1.总体结构</h3><p>数字电视节目推荐系统主要由四个功能模块组成：</p>
+<ul>
+<li>用户特性文件模块</li>
+<li>节目特性文件模块</li>
+<li>协同过滤模块</li>
+<li>推荐模块</li>
+</ul>
+<h3 id="2-节目特征建模"><a href="#2-节目特征建模" class="headerlink" title="2.节目特征建模"></a>2.节目特征建模</h3><ol>
+<li><h4 id="节目特征的描述"><a href="#节目特征的描述" class="headerlink" title="节目特征的描述"></a>节目特征的描述</h4><p>对节目特征的描述一般通过如下几个方面：</p>
+<ul>
+<li>节目<strong>分类</strong></li>
+<li>节目<strong>制作</strong>信息(如：主要演员、导演、制作商等)</li>
+<li>节目<strong>内容</strong>信息（如：节目内容、简介）</li>
+<li>节目<strong>播出</strong>信息（如：播出频道、播出时间、节目时间）</li>
+</ul>
+<p>节目特征可以来自各个途径的文本表述，也可以来自对节目的语音识别和图像识别形成的文本表述（这方面需要做更多的研究）</p>
+</li>
+<li><h4 id="节目特征的定义"><a href="#节目特征的定义" class="headerlink" title="节目特征的定义"></a>节目特征的定义</h4><p><strong>节目特征</strong>用来描述节目的娱乐性、创新性、知识性等特点。</p>
+<p>常用的节目特则定义包括：</p>
+<ul>
+<li>节目名称</li>
+<li>类型</li>
+<li>导演</li>
+<li>演员</li>
+<li>关键词</li>
+</ul>
+<p>基于节目特征实现的个性化推荐优势在于解决冷启动问题，即使只有非常少量的用户也能够产生不错的推荐列表（只需要分析单个用户的历史行为就可以进行推荐），并且推荐的效果往往能够符合用户的“心理预期”。</p>
+</li>
+<li><h4 id="节目特征的发展"><a href="#节目特征的发展" class="headerlink" title="节目特征的发展"></a>节目特征的发展</h4><p>节目特征模型的准确性对推荐效果的影响非常显著，目前较为成功的商业推荐引擎会使用更加专业的描述信息来构建节目特征，常用的描述信息包括:</p>
+<ul>
+<li>节目标签：用户对节目评价的“关键词”</li>
+<li>微类型：由专业人员对节目类型进行细化，像<code>netflix</code>就有一支专业的影评团队来负责给节目标注为微类型</li>
+<li>娱乐基因：从更多的维度来描述节目，如故事背景、特效、奖项、剧情结构、价值观、亚文化等，一般成一定的体系。而这种如果采用人工标注的方式则成本会非常高昂，因此目前行业内部基本都是使用语义分析技术，从影评信息中提取基因，如<code>Jinni</code>目前已经支持该项技术</li>
+</ul>
+</li>
+<li><h4 id="节目特征的定量计算"><a href="#节目特征的定量计算" class="headerlink" title="节目特征的定量计算"></a>节目特征的定量计算</h4><p>由于节目特征是通过一系列文本数据构成，在推荐算法中为了比较不同节目之前的相似性，需要将其进行定量计算。</p>
+<p>目前常用的计算方法包括：</p>
+<ul>
+<li>DICE系数</li>
+<li>编辑距离</li>
+</ul>
+<p>等等</p>
+</li>
+</ol>
+<h3 id="3-用户特征描述"><a href="#3-用户特征描述" class="headerlink" title="3.用户特征描述"></a>3.用户特征描述</h3><ol>
+<li><h4 id="用户特征描述"><a href="#用户特征描述" class="headerlink" title="用户特征描述"></a>用户特征描述</h4><p>初始用户特征的提取。用户特征文件的自动更新：显性反馈、隐形反馈（聚类、贝叶斯、NN算法等）。</p>
+<ul>
+<li>显性用户特征：基于分类人群收视率社会调查及用户主动方式的特征提取，能够解决用户初始特征的确实问题，即系统冷启动和突发兴趣问题；</li>
+<li>隐形用户特征：来自于用户长期行为特征数据的提取，反映的是用户稳定的喜好特征。</li>
+</ul>
+</li>
+<li><h4 id="用户特征的定义"><a href="#用户特征的定义" class="headerlink" title="用户特征的定义"></a>用户特征的定义</h4><p>用户特征（画像）用于刻画用户收看节目的口味，最常用的模型是：用户对节目进行评分的列表构成的向量</p>
+</li>
+<li><h4 id="用户特征的特种"><a href="#用户特征的特种" class="headerlink" title="用户特征的特种"></a>用户特征的特种</h4><p>对不同类型节目的评分，对不同节目标签的评分。用户特征的变种，往往能够在某种推荐场景中更加准确地描述用户的“口味”，从而使得特定的推荐算法更加准确。</p>
+</li>
+<li><h4 id="直接评分"><a href="#直接评分" class="headerlink" title="直接评分"></a>直接评分</h4><p>通过节目评分功能直接采集获取，较为知名的有IMBD、豆瓣电影等。显性评分能够直截了当地反映用户对节目的偏爱程度。评分方法包括：</p>
+<ul>
+<li>正负值（踩/顶）</li>
+<li>5分制</li>
+<li>10分制</li>
+<li>百分制</li>
+</ul>
+</li>
+<li><h4 id="广电大数据节目推荐系统算法研究及应用-用户特征提取"><a href="#广电大数据节目推荐系统算法研究及应用-用户特征提取" class="headerlink" title="广电大数据节目推荐系统算法研究及应用-用户特征提取"></a>广电大数据节目推荐系统算法研究及应用-用户特征提取</h4><p>间接评分：为了解决直接评分过于稀疏的问题，采用计算间接评分的方式构建用户特征。</p>
+<p>间接评分的修正：点播节目以主动收视为主，直接评分的可信度较高；直播节目以被动收视为主，如果采集到用户收看每个频道时间过长，则时间线上靠后的节目的隐性评分的可信度较低；</p>
+<p>基于用户收视模式修正间接评分是目前推荐算法研究的前沿之一，<code>netflix</code>·等公司正致力该方面的研究。</p>
+</li>
+<li><h4 id="家庭用户的特征提取"><a href="#家庭用户的特征提取" class="headerlink" title="家庭用户的特征提取"></a>家庭用户的特征提取</h4><p>在家庭中，多个家庭成员公用一个机顶盒的情况非常普遍，家庭用户的特征建模也是目前业界研究的重点。</p>
+<p>常用模型包括：</p>
+<ul>
+<li>基于用户组的特征模型：将用户的偏好整合为整个组呃偏好，这种模型适合于推荐适用于所有成员一起观看的节目；</li>
+<li>家庭内部特征模型：将家庭用户的特征按照不同的口味划分成为多个特征，每个特征都代表了一类需求，这种特征模型适用于有成员主导电视的情况，例如有孩子的家庭，每天的17点到19点可能由孩子主导电视收单动漫类节目。家庭内部口味的划分可以通过人工分类、聚类、双聚类等方法来实现。</li>
+</ul>
+<p><code>Jinni</code>提供了针对多个口味特征分别推荐的算法，<code>youtube</code>、<code>GroupLens</code>等也能够提供针对家庭或者多个好友共同收看节目的推荐算法。</p>
+</li>
+<li><h4 id="基于MDS聚类算法的用户特征提取"><a href="#基于MDS聚类算法的用户特征提取" class="headerlink" title="基于MDS聚类算法的用户特征提取"></a>基于MDS聚类算法的用户特征提取</h4><p>试验记录20个用户从2006年11月1日到2007年4月30日的全部收视节目，应用MDS变换聚类算法，通过计算可以看到19个用户的收视样本都具有较为明显的聚类特征，将这些收视样本在变换空间的对应点投影到两维坐标系，我们可以清晰地看到聚类云团。</p>
+<p>按照变换空间像点距离聚类中心近远的排序，本文计算得到了每个用户对应于其每个类别中心的10条实义节目样本。</p>
+<p>经过聚类得到的对应于每个用户每个类别中心的节目样本，具有相同或相似的节目特征，基本属于相同的节目类别，这些样本节目的特征，就反映了用户的收视特征。</p>
+<p>由于收视记录是基于机顶盒的，也即是基于家庭的，因此上述聚类结果存在多个类别中心的现象是合理的。</p>
+</li>
+</ol>
+<h3 id="4-特征的自动提取"><a href="#4-特征的自动提取" class="headerlink" title="4.特征的自动提取"></a>4.特征的自动提取</h3><h4 id="TF-IDF自动提取多类特征"><a href="#TF-IDF自动提取多类特征" class="headerlink" title="TF-IDF自动提取多类特征"></a>TF-IDF自动提取多类特征</h4><p>TF-IDF是一种用于资讯检索与资讯探勘的常用加权技术。字词的重要性随着它在文件中出现的次数成正比增加，但同时会随着它在语料库中出现的频率成反比下降。TF-IDF加权的各种形式常被搜寻引擎应用，作为文件与用户查询之间相关程度的度量或评级。</p>
+<ul>
+<li><p>节目标签提取：通过对节目内容信息，评论信息等文本进行分词，利用TF-IDF技术可以提取关键词形成节目标签。</p>
+</li>
+<li><p>用户画像：将用户看成文档，看过的节目名称和节目标签当作文档的关键词，则可以通过TF-IDF算法，提取用户画像。</p>
+</li>
+</ul>
+<h3 id="5-特征相似度匹配"><a href="#5-特征相似度匹配" class="headerlink" title="5.特征相似度匹配"></a>5.特征相似度匹配</h3><h4 id="深度学习计算特征相似度"><a href="#深度学习计算特征相似度" class="headerlink" title="深度学习计算特征相似度"></a>深度学习计算特征相似度</h4><p>在实际业务场景计算相似度时，单靠特征标签无法解决所有问题。</p>
+<p>例如：用户A，有一个标签为琅琊榜，其偏好程度为5；用户B有一个标签为伪装者，其偏好程度为4。如果就这个两个标签计算相似度，A与B的相似度为零。但这两部电视剧为同一套制作阵容，其相似度是非常高的。这时候可以应用词向量模型。</p>
+
+          
+        
+      
+    </div>
+
+    
+
+    
+    
+    
+
+    
+
+    
+      
+    
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="https://angr4mainyu.github.io/2019/05/02/推荐系统/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Angr4 Mainyu">
+      <meta itemprop="description" content="用来记录平常遇到的小东西">
+      <meta itemprop="image" content="/images/avatar.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Angr4 Mainyu's blog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                
+                <a href="/2019/05/02/推荐系统/" class="post-title-link" itemprop="url">推荐系统</a>
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+
+            
+            
+            
+
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+
+              
+                
+              
+
+              <time title="创建时间：2019-05-02 14:54:37 / 修改时间：14:55:59" itemprop="dateCreated datePublished" datetime="2019-05-02T14:54:37+08:00">2019-05-02</time>
+            
+
+            
+              
+
+              
+            
+          </span>
+
+          
+
+          
+            
+            
+              
+              <span class="post-comments-count">
+                <span class="post-meta-divider">|</span>
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-comment-o"></i>
+                </span>
+            
+                <span class="post-meta-item-text">评论数：</span>
+                <a href="/2019/05/02/推荐系统/#comments" itemprop="discussionUrl">
+                  <span class="post-comments-count valine-comment-count" data-xid="/2019/05/02/推荐系统/" itemprop="commentCount"></span>
+                </a>
+              </span>
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <h2 id="目前常用推荐算法分类"><a href="#目前常用推荐算法分类" class="headerlink" title="目前常用推荐算法分类"></a>目前常用推荐算法分类</h2><h3 id="1-个性化推荐"><a href="#1-个性化推荐" class="headerlink" title="1 个性化推荐"></a>1 个性化推荐</h3><ul>
+<li><h4 id="基于用户推荐"><a href="#基于用户推荐" class="headerlink" title="基于用户推荐"></a>基于用户推荐</h4><ol>
+<li>用户在注册的时候可以选择自己感兴趣的方向</li>
+<li>根据兴趣对用户进行分类，打上标签</li>
+<li>给用户推荐该类别中用户可能喜欢的东西</li>
+</ol>
+</li>
+<li><h4 id="基于内容推荐"><a href="#基于内容推荐" class="headerlink" title="基于内容推荐"></a>基于内容推荐</h4><ul>
+<li><p>思想</p>
+<p>根据用户的浏览历史，提取特征，根据特征来推荐用户没有接触过的推荐项</p>
+</li>
+<li><p>推荐方式</p>
+<p>一般是基于关键词进行推荐</p>
+</li>
+<li><p>优点</p>
+<ul>
+<li>不需要冷启动</li>
+<li>不需要惯用数据</li>
+<li>与流行度无关，可以推荐罕见特性的项</li>
+</ul>
+</li>
+<li><p>缺点</p>
+<ul>
+<li>项内容必须是机器可读和有意义的</li>
+<li>很容易对用户进行归档</li>
+<li>很少意外，缺少多样性</li>
+<li>很难联合多个项来进行推荐</li>
+</ul>
+</li>
+</ul>
+</li>
+<li><h4 id="基于关联规则的推荐"><a href="#基于关联规则的推荐" class="headerlink" title="基于关联规则的推荐"></a>基于关联规则的推荐</h4><ul>
+<li>商品集与商品集之间相关性判断</li>
+<li>如：Jacard系数</li>
+</ul>
+</li>
+<li><h4 id="基于效用进行推荐"><a href="#基于效用进行推荐" class="headerlink" title="基于效用进行推荐"></a>基于效用进行推荐</h4><ul>
+<li>效用函数</li>
+</ul>
+</li>
+<li><h4 id="基于知识推荐"><a href="#基于知识推荐" class="headerlink" title="基于知识推荐"></a>基于知识推荐</h4><ul>
+<li>根据某一个特定领域的一套规则来进行推荐</li>
+</ul>
+</li>
+<li><h4 id="协同过滤算法（Collaborative-Filtering）"><a href="#协同过滤算法（Collaborative-Filtering）" class="headerlink" title="协同过滤算法（Collaborative Filtering）"></a>协同过滤算法（Collaborative Filtering）</h4><ul>
+<li>优点<ul>
+<li>需要最小域</li>
+<li>不需要用户和项</li>
+<li>大部分场景能够产生足够好的结果</li>
+</ul>
+</li>
+<li>缺点<ul>
+<li>冷启动问题</li>
+<li>需要标准化产品</li>
+<li>需要很高的用户和项的比例</li>
+<li>流行度偏见</li>
+<li>无法解释推荐的理由</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+          
+        
+      
+    </div>
+
+    
+
+    
+    
+    
+
+    
+
+    
+      
+    
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
     <link itemprop="mainEntityOfPage" href="https://angr4mainyu.github.io/2019/04/29/VolgaCTF/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -1680,336 +2142,6 @@
 
 
     
-      
-
-  
-
-  
-  
-  
-
-  
-
-  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
-  
-  
-  
-  <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="https://angr4mainyu.github.io/2019/04/29/homework4/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="Angr4 Mainyu">
-      <meta itemprop="description" content="用来记录平常遇到的小东西">
-      <meta itemprop="image" content="/images/avatar.jpg">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="Angr4 Mainyu's blog">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-                
-                
-                <a href="/2019/04/29/homework4/" class="post-title-link" itemprop="url">数据库理论4</a>
-              
-            
-          </h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-
-            
-            
-            
-
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">发表于</span>
-              
-
-              
-                
-              
-
-              <time title="创建时间：2019-04-29 14:00:00 / 修改时间：14:14:11" itemprop="dateCreated datePublished" datetime="2019-04-29T14:00:00+08:00">2019-04-29</time>
-            
-
-            
-              
-
-              
-            
-          </span>
-
-          
-
-          
-            
-            
-              
-              <span class="post-comments-count">
-                <span class="post-meta-divider">|</span>
-                <span class="post-meta-item-icon">
-                  <i class="fa fa-comment-o"></i>
-                </span>
-            
-                <span class="post-meta-item-text">评论数：</span>
-                <a href="/2019/04/29/homework4/#comments" itemprop="discussionUrl">
-                  <span class="post-comments-count valine-comment-count" data-xid="/2019/04/29/homework4/" itemprop="commentCount"></span>
-                </a>
-              </span>
-            
-          
-
-          
-          
-
-          
-
-          
-
-          
-
-        </div>
-      </header>
-    
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          <h3 id="6-11-考虑图6-22所示关系数据库，主码加了下划线。给出关系代数表达式来表示下列的每一个查询："><a href="#6-11-考虑图6-22所示关系数据库，主码加了下划线。给出关系代数表达式来表示下列的每一个查询：" class="headerlink" title="6.11 考虑图6-22所示关系数据库，主码加了下划线。给出关系代数表达式来表示下列的每一个查询："></a>6.11 考虑图6-22所示关系数据库，主码加了下划线。给出关系代数表达式来表示下列的每一个查询：</h3><center><em>employee(<u>person_name</u>,street,city)</em></center>
-
-<center><em>works(<u>person_name</u>,company_name,salary)</em></center>
-
-<center><em>company(<u>company_name</u>,city)</em></center>
-
-<center> <em>manages(<u>person_name</u>,manager_name)</em> </center>
-          <!--noindex-->
-          
-            <div class="post-button text-center">
-              <a class="btn" href="/2019/04/29/homework4/#more" rel="contents">
-                阅读全文 &raquo;
-              </a>
-            </div>
-          
-          <!--/noindex-->
-        
-      
-    </div>
-
-    
-
-    
-    
-    
-
-    
-
-    
-      
-    
-    
-
-    
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </div>
-  
-  
-  
-  </article>
-
-
-    
-      
-
-  
-
-  
-  
-  
-
-  
-
-  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
-  
-  
-  
-  <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="https://angr4mainyu.github.io/2019/04/29/homework3/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="Angr4 Mainyu">
-      <meta itemprop="description" content="用来记录平常遇到的小东西">
-      <meta itemprop="image" content="/images/avatar.jpg">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="Angr4 Mainyu's blog">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-                
-                
-                <a href="/2019/04/29/homework3/" class="post-title-link" itemprop="url">数据库理论3</a>
-              
-            
-          </h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-
-            
-            
-            
-
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">发表于</span>
-              
-
-              
-                
-              
-
-              <time title="创建时间：2019-04-29 13:59:59 / 修改时间：14:04:57" itemprop="dateCreated datePublished" datetime="2019-04-29T13:59:59+08:00">2019-04-29</time>
-            
-
-            
-              
-
-              
-            
-          </span>
-
-          
-
-          
-            
-            
-              
-              <span class="post-comments-count">
-                <span class="post-meta-divider">|</span>
-                <span class="post-meta-item-icon">
-                  <i class="fa fa-comment-o"></i>
-                </span>
-            
-                <span class="post-meta-item-text">评论数：</span>
-                <a href="/2019/04/29/homework3/#comments" itemprop="discussionUrl">
-                  <span class="post-comments-count valine-comment-count" data-xid="/2019/04/29/homework3/" itemprop="commentCount"></span>
-                </a>
-              </span>
-            
-          
-
-          
-          
-
-          
-
-          
-
-          
-
-        </div>
-      </header>
-    
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          <h2 id="5-2"><a href="#5-2" class="headerlink" title="5.2"></a>5.2</h2><p><strong>写一个使用JDBC元数据特性的Java函数，该函数用<code>ResultSet</code>作为输入参数，并且把结果输出为合适的名字作为列名的表格形式。</strong><br></p>
-          <!--noindex-->
-          
-            <div class="post-button text-center">
-              <a class="btn" href="/2019/04/29/homework3/#more" rel="contents">
-                阅读全文 &raquo;
-              </a>
-            </div>
-          
-          <!--/noindex-->
-        
-      
-    </div>
-
-    
-
-    
-    
-    
-
-    
-
-    
-      
-    
-    
-
-    
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </div>
-  
-  
-  
-  </article>
-
-
-    
   </section>
 
   
@@ -2058,7 +2190,7 @@
                 
                   <a href="/archives/">
                 
-                    <span class="site-state-item-count">13</span>
+                    <span class="site-state-item-count">15</span>
                     <span class="site-state-item-name">日志</span>
                   </a>
                 </div>
@@ -2081,7 +2213,9 @@
                     
                       
                     
-                    <span class="site-state-item-count">2</span>
+                      
+                    
+                    <span class="site-state-item-count">3</span>
                     <span class="site-state-item-name">标签</span>
                   </a>
                 </div>
