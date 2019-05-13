@@ -106,7 +106,7 @@
 <meta property="og:locale" content="zh-CN">
 <meta property="og:image" content="https://angr4mainyu.github.io/2019/05/09/ABE/threshold.png">
 <meta property="og:image" content="https://angr4mainyu.github.io/2019/05/09/ABE/tree.png">
-<meta property="og:updated_time" content="2019-05-11T10:04:14.751Z">
+<meta property="og:updated_time" content="2019-05-13T07:13:10.839Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="基于属性的加密算法及其应用">
 <meta name="twitter:description" content="基于属性的加密算法及其应用最近需要做一个属性加密的系统，因此学习一下基于属性的加密算法。">
@@ -419,7 +419,7 @@
                 
                   <span class="post-meta-item-text">更新于</span>
                 
-                <time title="修改时间：2019-05-11 18:04:14" itemprop="dateModified" datetime="2019-05-11T18:04:14+08:00">2019-05-11</time>
+                <time title="修改时间：2019-05-13 15:13:10" itemprop="dateModified" datetime="2019-05-13T15:13:10+08:00">2019-05-13</time>
               
             
           </span>
@@ -542,7 +542,7 @@
 </li>
 <li><p>密钥抽取：：对于每一个访问树中的非叶子节点$x$,选择一个多项式$q(x)$,使得它的度为这个节点的阀值减一，即$𝑑𝑥 = 𝑘𝑥 − 1$；对于根节点$ r$则选择$ q_r(0)=y，$而对于其它非叶子结点，使得 $q_x(0)=q_{parent}(index(x))$;针对于叶子结 点的抽取的密钥为<br>$$<br>K_{x}=g^{\frac{q_{x}(0)}{t_{i}}}, i=\operatorname{att}(x)<br>$$</p>
 </li>
-<li><p>解密算法：对于所有的用户拥有的属性对应的叶子叶结点计算<br>$$<br>D_{x}=e(k_{x}, E_{i})=e(g, g)^{s \cdot q_{x}(0)}<br>$$<br>对于非叶子结点利用它的子节点的返回值，由下至上的进行递归运算<br>$$<br>F_{x}=\sum_{z \in S_{x}} F_{z}^{\Delta_{i}, s_{x}^{\prime}(0)}=e(g, g)^{s \cdot q_{x}(0)}<br>$$<br>其中 $ i=index(z), S^{\prime}<em>{x}={index(z) : z \in S</em>{x}} $。最后可以通过拉格朗日插值定理得到$ e(g, g)^{s y} $，故$ M=E^{\prime} / e(g, g)^{s y} $</p>
+<li><p>解密算法：对于所有的用户拥有的属性对应的叶子叶结点计算<br>$$<br>D_{x}=e(k_{x}, E_{i})=e(g, g)^{s \cdot q_{x}(0)}<br>$$<br>对于非叶子结点利用它的子节点的返回值，由下至上的进行递归运算<br>$$<br>F_{x}=\sum_{z \in S_{x}} F_{z}^{\Delta_{i}, s_{x}^{\prime}(0)}=e(g, g)^{s \cdot q_{x}(0)}<br>$$<br>其中 $ i=index(z), S^{\prime}_{x}={index(z) : z \in S_{x}} $。最后可以通过拉格朗日插值定理得到$ e(g, g)^{s y} $，故$ M=E^{\prime} / e(g, g)^{s y} $</p>
 </li>
 </ul>
 <h3 id="Brent-Waters的-CPABE方案"><a href="#Brent-Waters的-CPABE方案" class="headerlink" title="Brent Waters的 CPABE方案"></a>Brent Waters的 CPABE方案</h3><p>在这篇文章的方案中，作者提出了一个标准模型下可证安全的 CPABE 方案， 并且将对控制结构的描述提出了一种新的方式，通过利用线性秘密分享的方案 (LSSS)来决定哪些子集属于授权集合哪些属性的集合不是授权集合。基于这种方案 的属性基的加密打破了原来众多方案只能使用拉格朗日差值定理进行构造的模式， 无论在表述能力上还是安全证明上都有很大的贡献。 </p>
